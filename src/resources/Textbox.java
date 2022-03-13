@@ -64,6 +64,8 @@ public class Textbox extends Actor {
 	
 	boolean textEmptied = true;
 	
+	boolean queryRecentlyEnded = false;
+	
 	// put filepath of fontsheet to use as the font
 	public Textbox (String textToDisplay){
 		super();
@@ -110,7 +112,10 @@ public class Textbox extends Actor {
 			}
 		} else {
 			reserveMessages.add(toPush);
-			textEmptied = false;
+		}
+		if (queryRecentlyEnded) {
+			queryRecentlyEnded = false;
+			advanceText();
 		}
 	}
 	/**
@@ -469,6 +474,7 @@ public class Textbox extends Actor {
 		defaultSize= textSize;
 }
 
+	//will only return true once per emptyness
 	public boolean isEmpty() {
 		boolean wasEmpty = textEmptied;
 		textEmptied = false;
@@ -548,6 +554,12 @@ public void drawBox () {
 			if (query.getResult() != -1) {
 				queryResult = query.getResult();
 				query.deactivate();
+				if (!reserveMessages.isEmpty()) {
+					this.advanceText();
+				} else {
+					queryRecentlyEnded = true;
+				}
+				
 			}
 		}
 		
