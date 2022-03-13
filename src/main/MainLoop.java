@@ -2,21 +2,24 @@ package main;
 
 import java.awt.Toolkit;
 
-import resources.SpriteContainer;
 
 public class MainLoop {
 	//Main class
 	private static GameWindow gameWindow;
-	private static SpriteContainer sprites;
 	private static long delay; //Used for loop timing
+	static long startTime; //Used for loop timing
+	public static long getStartTime() {
+		return startTime;
+	}
+	public static void setStartTime(long startTime) {
+		MainLoop.startTime = startTime;
+	}
 	public static void main (String[] args) {
 		//Main method
 		double framerate = 30; //The framerate; pretty self-explanitory
 		boolean running = true; //Currently unused, but setting this to false would stop the game
-		long startTime; //Used for loop timing
 		delay = 0; //Used for loop timing
 		gameWindow = new GameWindow (); //Create the window
-		sprites = new SpriteContainer (); //Create the sprite container
 		GameCode gameCode = new GameCode (); //Initialize game code
 		gameCode.initialize (); //Note: runs before gameCode.gameLoop ()
 		while (running) {
@@ -52,9 +55,6 @@ public class MainLoop {
 	}
 	public static GameWindow getWindow () {
 		return gameWindow;
-	}
-	public static SpriteContainer getSprites () {
-		return sprites;
 	}
 	public static long getDelay () {
 		return delay;

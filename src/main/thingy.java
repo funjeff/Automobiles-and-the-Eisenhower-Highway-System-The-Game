@@ -14,7 +14,6 @@ public class thingy implements com.codedisaster.steamworks.SteamUserStatsCallbac
   
   public thingy()
   {
-    System.out.println("please");
     try {
       if (SteamAPI.init()) {
         userStats = new SteamUserStats(this);

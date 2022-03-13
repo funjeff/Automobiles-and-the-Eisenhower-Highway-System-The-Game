@@ -1,0 +1,2 @@
+$src resources/sprites/farmer frontLeft.png
+grid 17 37

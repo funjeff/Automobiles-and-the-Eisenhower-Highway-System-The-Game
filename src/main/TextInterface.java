@@ -1,6 +1,8 @@
 package main;
 
 import javax.sound.sampled.Clip;
+
+import resources.DataManager;
 import resources.Sprite;
 
 public class TextInterface extends GameAPI
@@ -24,7 +26,7 @@ public class TextInterface extends GameAPI
   {
     this.width = width;
     this.height = height;
-    this.font = sprites.font;
+    this.font = DataManager.getSprites().font;
     this.selector = selector;
     text = new String[height];
     for (int i = 0; i < text.length; i++) {
@@ -68,8 +70,7 @@ public class TextInterface extends GameAPI
   
   public void queryEvent(String selected) {
     this.selected = selected;
-    GameCode.clip2.stop();
-    GameCode.stuff.playSoundEffect(6.0F, "soundEffects/Click.wav");
+    DataManager.getPlayer().playSoundEffect(6.0F, "soundEffects/Click.wav");
   }
   
   public void append(String str) { int tmp8_5 = line; String[] tmp8_1 = text;tmp8_1[tmp8_5] = (tmp8_1[tmp8_5] + str);
@@ -149,8 +150,7 @@ public class TextInterface extends GameAPI
   public void render() {
     for (int i = 0; i < text.length; i++) {
       for (int j = 0; j < text[i].length(); j++) {
-        font.setFrame(text[i].charAt(j));
-        font.draw(j * 8, i * 12 + 1);
+        font.draw(j * 8, i * 12 + 1,text[i].charAt(j));
       }
     }
     if (selectorPos != -1)
@@ -160,8 +160,7 @@ public class TextInterface extends GameAPI
   public void renderAtAPlace(int x, int y, String[] message, Sprite color) {
     for (int i = 0; i < message.length; i++)
       for (int j = 0; j < message[i].length(); j++) {
-        color.setFrame(message[i].charAt(j));
-        color.draw(j * 8 + x, i * 10 + 1 + y);
+        color.draw(j * 8 + x, i * 10 + 1 + y, message[i].charAt(j));
       }
   }
   

@@ -1,0 +1,2 @@
+$src resources/sprites/farmer backRight.png
+grid 18 35

@@ -1,0 +1,2 @@
+$src resources/sprites/truck.png
+grid 120 255

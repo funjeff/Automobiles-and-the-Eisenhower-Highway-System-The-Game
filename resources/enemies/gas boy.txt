@@ -1,0 +1,34 @@
+{
+	"enemyData":[
+		"isburrning;false"
+	],
+	"stats":{
+		"health": "1000",
+		"encounterText": "GAS BOY READYS HIS GAS",
+		"name": "Gas Boy",
+		"sprite":"resources/sprites/gas boy.png"
+	},
+	"attacks":[
+		{"text":"GAS BOY USED A GAS BASED ATTACK IT WAS EFFECTIVE", "chance":"10", "minDamage":100, "maxDamage":200},
+		{"text":"GAS BOY POWERS ON HIS GAS POWERED HAT HE BECAME MORE POWERFUL", "chance":"20","effect":"GasHatOn"},
+		{"text":"GAS BOY ATTEMPTS TO DROWN YOU IN GAS", "chance":"10","minDamage":30,"maxDamage":300},
+		{"text":"GAS BOY ATTACKS YOU WITH A KNIFE MADE OUT OF FROZEN GAS ... THAT HAS TO BE THE FIRST TIME SOMEONE WAS HURT BECAUSE GAS IS TOO COLD", "chance":"10","minDamage":150,"maxDamage":220},
+		{"text":"GAS BOY FORCE FEEDS YOU SOME GAS YOU FEEL LIKE YOU WANT TO THROW UP", "chance":"10","minDamage":150,"maxDamage":220,"effect":"GasForceFeed"}
+		
+
+	],
+	"farmerAttacks":[
+		{"text":"ATTACK 1 GO BOOM","name":"ATTACK 1", "chance":"10", "minDamage":100, "maxDamage":200,"effect":"Template"},
+		{"text":"ATTACK 2", "chance":"50"},
+		{"text":"ATTACK 3 BAM", "chance":"40","effect":"Template"}
+	],
+	"inbetweenText":[
+		"GAS BOY CHUGS SOME GAS ... THAT CAN'T BE HEALTHY",
+		"THE GAS POWERED HAT IS MAKING SOME LOAD MECHANICAL WHIRLS",
+		"GAS BOY DEMANDS MORE GAS DESPITE HAVING 5 CONTAINERS OF GAS ON HIM",
+		"GAS BOY IS WEARING A BACKPACK ... FULL OF GAS",
+		"GAS BOY IS A SWEET LITTLE GUY",
+		"GAS BOY IS GIVING BIG CHAOTIC GOOD VIBES",
+		"GAS BOY TRIES TO CHILL BUT THE GAS POWERED HAT WARMS HIM UP"
+		]
+}
