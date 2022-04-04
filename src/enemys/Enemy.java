@@ -157,9 +157,9 @@ public class Enemy {
 	public Attack pullAttack () {
 		Random rand = new Random ();
 		int pulledNum = rand.nextInt(100);
-		int curVal = 0;
+		double curVal = 0;
 		for (int i = 0; i < attacks.size(); i++) {
-			curVal = curVal + attacks.get(i).chance;
+			curVal = curVal + attacks.get(i).getChance();
 			if (pulledNum < curVal) {
 				return attacks.get(i);
 			}
@@ -171,9 +171,10 @@ public class Enemy {
 	public Attack pullPlayerAttack () {
 		Random rand = new Random ();
 		int pulledNum = rand.nextInt(100);
-		int curVal = 0;
+		double curVal = 0;
 		for (int i = 0; i < gettingAttacked.size(); i++) {
-			curVal = curVal + gettingAttacked.get(i).chance;
+			curVal = curVal + gettingAttacked.get(i).getChance();
+	
 			if (pulledNum < curVal) {
 				return gettingAttacked.get(i);
 			}
@@ -188,59 +189,110 @@ public class Enemy {
 	}
 	
 	public void addAttack(Attack toAdd) {
-		if (attacks.size() == 0) {
-			attacks.add(toAdd);
-			toAdd.chance = 100;
-			return;
-		}
 		
-		int loweredChance = toAdd.chance/attacks.size();
+		double totalChance = 0;
 		
 		for (int i = 0; i < attacks.size(); i++) {
-			attacks.get(i).chance = attacks.get(i).chance - loweredChance;
+			totalChance = totalChance + attacks.get(i).getChance();
 		}
 		
-		attacks.add(toAdd);
+		if (totalChance > 99) {
+			
+			double totalDisplace = 0;
+			
+			for (int i = 0; i < attacks.size(); i++) {
+				totalDisplace = totalDisplace + attacks.get(i).getChanceDisplace();
+			}
+			
+			totalDisplace = totalDisplace - toAdd.chance;
+			
+			attacks.add(toAdd);
+			double loweredChance = totalDisplace/attacks.size();
+			
+			for (int i = 0; i < attacks.size(); i++) {
+				attacks.get(i).setChanceDisplace(loweredChance);
+			}
+			
+		} else {
+			attacks.add(toAdd);
+		}
 		
 	}
 	
 	public void removeAttack(Attack toRemove) {
 		
+		
 		attacks.remove(toRemove);
 		
-		int raisedChance = toRemove.chance/attacks.size();
+		double totalDisplace = 0;
 		
 		for (int i = 0; i < attacks.size(); i++) {
-			attacks.get(i).chance = attacks.get(i).chance + raisedChance;
+			totalDisplace = totalDisplace + attacks.get(i).getChanceDisplace();
+		}
+		
+		totalDisplace = totalDisplace + toRemove.getChance();
+		
+		double raisedChance = totalDisplace/attacks.size();
+		
+		for (int i = 0; i < attacks.size(); i++) {
+			attacks.get(i).setChanceDisplace(raisedChance);
 		}
 		
 	}
 	
 	public void removeAttack(int toRemove) {
-		int raisedChance = attacks.get(toRemove).chance/(attacks.size() - 1);
+		
+		
+		double totalDisplace = 0;
+		
+		for (int i = 0; i < attacks.size(); i++) {
+			if (i != toRemove) {
+			totalDisplace = totalDisplace + attacks.get(i).getChanceDisplace();
+			}
+		}
+		
+		totalDisplace = totalDisplace + attacks.get(toRemove).getChance();
+		
+		double raisedChance = totalDisplace/(attacks.size() - 1);
 		
 		attacks.remove(toRemove);
 		
 		for (int i = 0; i < attacks.size(); i++) {
-			attacks.get(i).chance = attacks.get(i).chance + raisedChance;
+			attacks.get(i).setChanceDisplace(raisedChance);
 		}
 		
 	}
 	
 	public void addPlayerAttack(Attack toAdd) {
-		if (gettingAttacked.size() == 0) {
-			gettingAttacked.add(toAdd);
-			toAdd.chance = 100;
-			return;
-		}
 		
-		int loweredChance = toAdd.chance/gettingAttacked.size();
+		double totalChance = 0;
 		
 		for (int i = 0; i < gettingAttacked.size(); i++) {
-			gettingAttacked.get(i).chance = gettingAttacked.get(i).chance - loweredChance;
+			totalChance = totalChance + gettingAttacked.get(i).getChance();
 		}
 		
-		gettingAttacked.add(toAdd);
+		if (totalChance > 99) {
+		
+			double totalDisplace = 0;
+			
+			for (int i = 0; i < attacks.size(); i++) {
+				totalDisplace = totalDisplace + attacks.get(i).getChanceDisplace();
+			}
+			
+			totalDisplace = totalDisplace - toAdd.chance;
+			
+			gettingAttacked.add(toAdd);
+			
+			double loweredChance = totalDisplace/attacks.size();
+			for (int i = 0; i < gettingAttacked.size(); i++) {
+				gettingAttacked.get(i).setChanceDisplace(loweredChance);
+			}
+		
+		} else {
+			gettingAttacked.add(toAdd);
+		}
+		
+		
 		
 	}
 	
@@ -248,21 +300,42 @@ public class Enemy {
 		
 		gettingAttacked.remove(toRemove);
 		
-		int raisedChance = toRemove.chance/gettingAttacked.size();
+		double totalDisplace = 0;
 		
 		for (int i = 0; i < gettingAttacked.size(); i++) {
-			gettingAttacked.get(i).chance = gettingAttacked.get(i).chance + raisedChance;
+			totalDisplace = totalDisplace + gettingAttacked.get(i).getChanceDisplace();
 		}
+		
+		totalDisplace = totalDisplace + toRemove.getChance();
+		
+		double raisedChance = totalDisplace/gettingAttacked.size();
+		
+		for (int i = 0; i < attacks.size(); i++) {
+			gettingAttacked.get(i).setChanceDisplace(raisedChance);
+		}
+		
 		
 	}
 	
 	public void removePlayerAttack(int toRemove) {
-		int raisedChance = gettingAttacked.get(toRemove).chance/(gettingAttacked.size() - 1);
+		double totalDisplace = 0;
+		
+		for (int i = 0; i < gettingAttacked.size(); i++) {
+			if (i != toRemove) {
+			totalDisplace = totalDisplace + gettingAttacked.get(i).getChanceDisplace();
+			}
+		}
+		
+		totalDisplace = totalDisplace + gettingAttacked.get(toRemove).getChance();
+		
+		double raisedChance = totalDisplace/(gettingAttacked.size() - 1);
 		
 		gettingAttacked.remove(toRemove);
+		
 		for (int i = 0; i < gettingAttacked.size(); i++) {
-			gettingAttacked.get(i).chance = gettingAttacked.get(i).chance + raisedChance;
+			gettingAttacked.get(i).setChanceDisplace(raisedChance);
 		}
+		
 		
 	}
 	

@@ -2,7 +2,7 @@ package enemys;
 
 public class Attack {
 	
-	public int chance;
+	public double chance;
 
 	public int minDamage = 0;
 	public int maxDamage = 0;
@@ -10,6 +10,8 @@ public class Attack {
 	public String text;
 	
 	public String attackName; //unused most of the time but certain selectable attacks do require a name
+	
+	public double chanceDisplace = 0;
 	
 	
 	public Attack (String attackText) {
@@ -41,12 +43,20 @@ public class Attack {
 		return attackName;
 	}
 	
-	public int getChance() {
-		return chance;
+	public double getChance() {
+		return chance + chanceDisplace;
 	}
 
 	public void setChance(int chance) {
 		this.chance = chance;
+	}
+	
+	public double getChanceDisplace () {
+		return chanceDisplace;
+	}
+	
+	public void setChanceDisplace (double displace) {
+		chanceDisplace = displace;
 	}
 	
 }

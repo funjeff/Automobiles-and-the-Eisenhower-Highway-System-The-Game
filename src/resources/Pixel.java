@@ -44,6 +44,11 @@ public class Pixel implements Comparable {
 		return color & 0x00FFFFFF;
 	}
 	
+
+	public boolean isTransparent() {
+		return getAlpha() == 0;
+	}
+	
 	@Override
 	public int compareTo (Object o) {
 		if (o instanceof Pixel) {

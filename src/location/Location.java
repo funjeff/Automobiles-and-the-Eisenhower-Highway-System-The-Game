@@ -57,6 +57,7 @@ public class Location {
 	}
 	public void removeActor (Actor removeActor) {
 		actors.remove(removeActor);
+		GameCode.removeAsker(removeActor);
 	}
 	public ArrayList <Actor> getActors (){
 		return actors;

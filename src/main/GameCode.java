@@ -33,7 +33,8 @@ public class GameCode extends GameAPI {
   
   static BattleInterface meme;
   
-  static ArrayList <Integer> heldKeys = new ArrayList <Integer> ();
+  static ArrayList <Asker> askers = new ArrayList <Asker> ();
+  
   
   public static void initialize(){
 //      thing = new thingy();
@@ -52,8 +53,8 @@ public class GameCode extends GameAPI {
 //      }
         gasBoy = new Enemy();
         gasBoy.importEnemyData("resources/enemies/gas boy.txt");
-        meme = new BattleInterface();
-        meme.setEnemy(gasBoy);
+        //meme = new BattleInterface();
+        //meme.setEnemy(gasBoy);
         
         
 }
@@ -70,6 +71,11 @@ public class GameCode extends GameAPI {
 	  return veiwY;
   }
   
+  public static void removeAsker(Actor asker) {
+	  Asker toAsk = getAsker(asker);
+	  askers.remove(toAsk);
+  }
+  
   
   public void gameLoop() {
 	  
@@ -79,10 +85,12 @@ public class GameCode extends GameAPI {
 //      SteamAPI.runCallbacks();
 //    }
     
-	  for (int i = 0; i < heldKeys.size(); i++) {
-	    	if (!super.keyCheck(heldKeys.get(i))) {
-	    		heldKeys.remove(i);
-	    		i--;
+	  for (int i = 0; i < askers.size(); i++) {
+	    	for (int j = 0; j < askers.get(i).getKeys().size(); j++) {
+	    		if (!super.keyCheck(askers.get(i).heldKeys.get(i))) {
+	    			askers.get(i).getKeys().remove(j);
+	    			j--;
+	    		}
 	    	}
 	    }
     
@@ -96,7 +104,7 @@ public class GameCode extends GameAPI {
     	LocationHandler.renderInteriorLocation();
     }
     
-    meme.draw();
+    //meme.draw();
     //t.draw();
     //t.setX(200);
    // t.setY(200);
@@ -148,22 +156,48 @@ public class GameCode extends GameAPI {
 		return MainLoop.getWindow().resolution[1];
 	}
 	
-	public static boolean keyCheck(int keyCode) {
+	public static boolean keyCheck(int keyCode, Actor whosAsking) {
 		boolean returnValue = MainLoop.getWindow().keyCheck(keyCode);
 	    
+		Asker asking = getAsker(whosAsking);
+		
 		if (returnValue) {
 			
-			heldKeys.add(keyCode);
+			asking.getKeys().add(keyCode);
 		}
 		
 		return returnValue;
 	  }
+	
+	public static Asker getAsker (Actor whosAsking) {
+	
+		Asker asking = null;
+		
+		boolean foundAsker = false;
+		
+		for (int i = 0; i < askers.size(); i++) {
+			if (askers.get(i).isAsker(whosAsking)) {
+				asking = askers.get(i);
+				foundAsker = true;
+				break;
+			}
+		}
+		
+		if (!foundAsker) {
+			askers.add(new Asker(whosAsking));
+			asking = askers.get(askers.size() -1);
+		}
+		
+		return asking;
+	}
 	  
-	  public static boolean keyPressed(int keyCode) {
+	  public static boolean keyPressed(int keyCode, Actor whosAsking) {
 		boolean returnValue = MainLoop.getWindow().keyPressed(keyCode);
 		
-		if (returnValue && !heldKeys.contains(keyCode)) {
-			heldKeys.add(keyCode);
+		Asker asking = getAsker(whosAsking);
+		
+		if (returnValue && !asking.getKeys().contains(keyCode)) {
+			asking.getKeys().add(keyCode);
 			return returnValue;
 		} else {
 			return false;
@@ -176,6 +210,10 @@ public class GameCode extends GameAPI {
 	    return MainLoop.getWindow().keyReleased(keyCode);
 	  }
 	
+	  
+	 
+	  
+	  
 //  public void customEvent() {
 //    int lowestnumber = 358;
 //    int numberInQuestion = 0;

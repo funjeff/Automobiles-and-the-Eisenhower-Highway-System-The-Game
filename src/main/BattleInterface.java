@@ -16,6 +16,8 @@ public class BattleInterface {
 	
 	boolean summonMenu = false;
 	
+	Textbox nameBox;
+	
 	public BattleInterface() {
 		
 	}
@@ -25,6 +27,7 @@ public class BattleInterface {
 		boolean emptyEntered = dialogBox.isEmpty();
 		int queryResults = dialogBox.getQueryResult();
 		
+		nameBox.draw();
 		
 		if (queryResults == -1) {
 			if(emptyEntered) {
@@ -39,6 +42,8 @@ public class BattleInterface {
 				choseOption(queryResults);
 			}
 		}
+		
+		enemy.sprite.draw(211, 80);
 		dialogBox.draw();
 	}
 
@@ -116,6 +121,9 @@ public class BattleInterface {
 		dialogBox.changeHeight(7);
 		dialogBox.setX(80);
 		dialogBox.setY(340);
+		nameBox = new Textbox(toFight.enemyName);
+		nameBox.setX(257);
+		nameBox.setY(20);
 		
 	}
 	

@@ -97,6 +97,16 @@ public class Textbox extends Actor {
 	}
 	
 	public void pushString(String toPush) {
+		
+		ArrayList <String> segments = bSplit(toPush);
+		
+		if (segments.size() != 1) {
+			for (int i = 0; i < segments.size(); i++) {
+				pushString(segments.get(i));
+			}
+		}
+		
+		
 		//if we are posting a query with nothing else before it push it up immeditly
 		if (toPush.charAt(0) == '~' && toPush.charAt(1) == 'Q' && reserveMessages.isEmpty()) {
 			String[] choices = toPush.substring(2).split(":");
@@ -452,14 +462,15 @@ public class Textbox extends Actor {
 		return (width * height)/256;
 	}
 	public void setTextSize(int textSize) {	
-	
-			if (this.textSize != textSize) {
-
-				fontSheet = new Sprite (Sprite.scale(getTextboxResource ("resources/sprites/Text/" + tempColor + ".png", "grid "+ this.textSize + " " + this.textSize, fontSheet.getOpacity()), textSize, textSize));
-				
-				
-				this.textSize = textSize;
-			}
+		
+		fontSheet = new Sprite (Sprite.scale(getTextboxResource ("resources/sprites/Text/" + tempColor + ".png", "grid "+ this.textSize + " " + this.textSize, fontSheet.getOpacity()), textSize, textSize));
+		
+		
+		this.textSize = textSize;
+		
+		if (textSize > largestSize) {
+			largestSize = textSize;
+		}
 	}
 	
 	public void setDefultSize(int textSize) {	
@@ -488,11 +499,41 @@ public class Textbox extends Actor {
 		return queryResult;
 	}
 	
+	/**
+	 * splits the message into a list of strings split up by ~B
+	 * this is diffrent from the default split becasue it takes into account ending tildes
+	 * ie something like ~S16~BROOO wont be split because that ~B is clearly not intended to be a split
+	 */
+	public ArrayList <String> bSplit (String toParse){
+		
+		ArrayList <String> toReturn = new ArrayList <String>();
+		
+		int segIndex = 0;
+		
+		for (int i = 0; i < toParse.length(); i++) {
+			if (toParse.charAt(i) == '~') {
+				int [] data = this.simulateTildeForSpace(toParse, i);
+				if (data[3] != 0) {
+					toReturn.add(toParse.substring(segIndex,i));
+				}
+				i = data[0];
+				
+				if (data[3] != 0) {
+					segIndex = i+1;
+				}
+				
+			}
+		}
+		toReturn.add(toParse.substring(segIndex));
+		return toReturn;
+	}
+	
 	public void advanceText() {
+	//	System.out.println(reserveMessages);
 		if (!reserveMessages.isEmpty()) {
 			//pop the new regular message into the box
 			//its worth noteing that there will NEVER be a query message as the next message for here because if there was it would have been poped on automatically before it makes it here
-			text = "~S" + endSize + "~" + reserveMessages.get(0);
+			text = "~S" + defaultSize + "~" + reserveMessages.get(0);
 			amountScrolled = 0;
 			reserveMessages.remove(0);
 			
@@ -536,6 +577,7 @@ public void drawBox () {
 		}
 	} else {
 		if (scrollPaused + curTime < System.currentTimeMillis()) {
+			curTime = curTime + scrollPaused;
 			scrollPaused = 0;
 		}
 	}
@@ -543,8 +585,9 @@ public void drawBox () {
 		amountScrolled = text.length();
 	}
 	if (GameCode.keyPressed(KeyEvent.VK_ENTER) && (amountScrolled >= getFakePos(text.length() - 1) || scrollSpeed == 0)) {
-		advanceText();
+		advanceText();	
 	}
+	
 
 	//draws the box itself
 	if (renderBox) {
@@ -620,6 +663,8 @@ public void drawBox () {
 	int shakeInfoNum = 0;
 	
 
+	
+	
 	for (int i = 0; i < text.length(); i++) {
 		
 		if (getFakePos(i) >= amountScrolled && scrollSpeed != 0) {
@@ -629,7 +674,7 @@ public void drawBox () {
 		char drawChar = text.charAt(i);
 		
 		if (drawChar == '~') {
-			
+			int old = text.length();
 			
 			i = this.dealWithTilde(text, i);
 			
@@ -639,14 +684,25 @@ public void drawBox () {
 				yPos = yPos + (int)(largestSize * lineSpacing);
 				newLine = newLine - 1;
 			}
+			
+			
 			while (changeTextShake != 0) {
 				textShake = !textShake;
+				changeTextShake = changeTextShake - 1;
 			}
 			if (i >= text.length()) {
 				break;
 			}
 			
+			//still pretty jank lol
+			//basically fixes the "letter appearing bug" by just ignoring it entirly
+			//if it gets to a stop it just is done for now
+			if (old != text.length()) {
+				break;
+			}
+			
 		}
+		
 		
 		double shakeOffsetX = 0;
 		double shakeOffsetY = 0;
@@ -769,6 +825,7 @@ public void drawBox () {
 		}	
 		
 		if (xPos > GameCode.getVeiwX() && xPos < GameCode.getVeiwX() + GameCode.getResolutionX() && yPos > GameCode.getVeiwY() && yPos < GameCode.getVeiwY() + GameCode.getResolutionY()) {
+		
 			fontSheet.draw(xPos + (int)shakeOffsetX - GameCode.getVeiwX (), yPos + (int)shakeOffsetY - GameCode.getVeiwY (), text.charAt(i));
 			if (textSize > largestSize) {
 				largestSize = textSize;
@@ -817,6 +874,17 @@ private int simulateTilde (String message, int startI) {
 					i = i + 1;
 					identifyingChar = message.charAt(i);
 				}
+				i = i + 1;
+				break;
+			case 'A':
+				i = i + 1;
+				identifyingChar = message.charAt(i);
+				
+				while (identifyingChar != '~') {
+					i = i + 1;
+					identifyingChar = message.charAt(i);
+				}
+				i = i + 1;
 				break;
 			case 'P':
 				i = i + 1;
@@ -851,6 +919,8 @@ private int [] simulateTildeForSpace (String message, int startI) {
 	int newLineAmount = 0;
 	int endSize = -1;
 	int i = startI + 1;
+	int splits = 0;
+	
 	
 	char identifyingChar = message.charAt(i);
 	switch (identifyingChar) {
@@ -859,7 +929,7 @@ private int [] simulateTildeForSpace (String message, int startI) {
 			identifyingChar = message.charAt(i);
 			while (identifyingChar != '~') {
 				i = i + 1;
-				identifyingChar = text.charAt(i);
+				identifyingChar = message.charAt(i);
 			}
 			i = i + 1;
 			break;
@@ -884,6 +954,17 @@ private int [] simulateTildeForSpace (String message, int startI) {
 				i = i + 1;
 				identifyingChar = message.charAt(i);
 			}
+			i = i + 1;
+			break;
+		case 'A':
+			i = i + 1;
+			identifyingChar = message.charAt(i);
+			
+			while (identifyingChar != '~') {
+				i = i + 1;
+				identifyingChar = message.charAt(i);
+			}
+			i = i + 1;
 			break;
 		case 'P':
 			i = i + 1;
@@ -898,6 +979,10 @@ private int [] simulateTildeForSpace (String message, int startI) {
 		case 'H':
 			i = i +1;
 			break;
+		case 'B':
+			i = i + 1;
+			splits = splits + 1;
+			break;
 		case 'N':
 			newLineAmount = newLineAmount + 1;
 			i = i + 1;
@@ -911,12 +996,13 @@ private int [] simulateTildeForSpace (String message, int startI) {
 			if (values[2] != -1) {
 				endSize = values[2];
 			}
+			splits = splits + values[3];
 		}
 	} catch (StringIndexOutOfBoundsException e) {
 		
 	}
 	
-	int [] returnValues = {i,newLineAmount,endSize};
+	int [] returnValues = {i,newLineAmount,endSize,splits};
 	return returnValues;
 	}
 
@@ -928,6 +1014,7 @@ private int [] simulateTildeForSpace (String message, int startI) {
  * ~H starts the text shake
  * ~N makes a newline at the current position
  * ~A100~ pauses the scrolling for 100 MS
+ * ~B puts the next part in its own box
  */
 private int dealWithTilde (String message, int startI) {
 	int i = startI;
@@ -960,6 +1047,7 @@ private int dealWithTilde (String message, int startI) {
 				identifyingChar = message.charAt(i);
 			}
 			if (largestSize == 0) {
+				
 				defaultSizeUsed = false;
 			}
 			this.setTextSize(Integer.parseInt(size));
@@ -1010,7 +1098,22 @@ private int dealWithTilde (String message, int startI) {
 			this.pauseScrolling(Integer.parseInt(time));
 			
 			//removes the pause message from the string so it can't be read again
-			message = message.substring(0,tildPos) + message.substring(i);
+		
+			// I LOVE JANK
+			// basically I don't know how to fix this "first letter appearing bug" so im just gonna always have the first letter be a space
+			if (message.substring(i).charAt(0) != ' ') {
+				message = message.substring(0,tildPos -1) + " " +  message.substring(i);
+			} else {
+				message = message.substring(0,tildPos -1) + message.substring(i);
+			}
+			this.changeText(message);
+
+			i = tildPos - 2;
+		//	System.out.println(this.getPureText().charAt(this.getFakePos(i)));
+			//tells the textbox that it actually shouldant have scrollen this far yet
+			if (amountScrolled > i) {
+				amountScrolled = i;
+			}
 			
 			break;
 			
